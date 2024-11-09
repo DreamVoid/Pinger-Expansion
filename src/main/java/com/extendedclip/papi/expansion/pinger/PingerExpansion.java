@@ -21,13 +21,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-/* loaded from: Expansion-pinger.jar:com/extendedclip/expansion/pinger/PingerExpansion.class */
 public class PingerExpansion extends PlaceholderExpansion implements Cacheable, Taskable, Configurable {
     private BukkitTask pingTask = null;
     private String online = "&aOnline";
     private String offline = "&cOffline";
-    private final Map<String, Pinger> servers = new ConcurrentHashMap();
-    private final Map<String, InetSocketAddress> toPing = new ConcurrentHashMap();
+    private final Map<String, Pinger> servers = new ConcurrentHashMap<>();
+    private final Map<String, InetSocketAddress> toPing = new ConcurrentHashMap<>();
     private int interval = 60;
 
     public Map<String, Object> getDefaults() {
@@ -38,17 +37,14 @@ public class PingerExpansion extends PlaceholderExpansion implements Cacheable, 
         return defaults;
     }
 
-    /* JADX WARN: Type inference failed for: r1v9, types: [com.extendedclip.expansion.pinger.PingerExpansion$1] */
     public void start() {
-        String on = getString("online", "&aOnline");
-        this.online = on != null ? on : "&aOnline";
-        String off = getString("offline", "&cOffline");
-        this.offline = off != null ? off : "&cOffline";
+        this.online = getString("online", "&aOnline");
+        this.offline = getString("offline", "&cOffline");
         int time = getInt("check_interval", 60);
         if (time > 0) {
             this.interval = time;
         }
-        this.pingTask = new BukkitRunnable() { // from class: com.extendedclip.expansion.pinger.PingerExpansion.1
+        this.pingTask = new BukkitRunnable() {
             public void run() {
                 if (!PingerExpansion.this.toPing.isEmpty()) {
                     for (Map.Entry<String, InetSocketAddress> address : PingerExpansion.this.toPing.entrySet()) {
@@ -59,18 +55,18 @@ public class PingerExpansion extends PlaceholderExpansion implements Cacheable, 
                             } else if (PingerExpansion.this.servers.containsKey(address.getKey())) {
                                 PingerExpansion.this.servers.remove(address.getKey());
                             }
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(getPlaceholderAPI(), 20L, 20 * this.interval);
+        }.runTaskTimerAsynchronously(getPlaceholderAPI(), 20L, 20L * this.interval);
     }
 
     public void stop() {
         try {
             this.pingTask.cancel();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         this.pingTask = null;
     }
@@ -84,18 +80,17 @@ public class PingerExpansion extends PlaceholderExpansion implements Cacheable, 
         return true;
     }
 
+    @Override
     public String getAuthor() {
         return "clip";
     }
 
+    @Override
     public String getIdentifier() {
         return "pinger";
     }
 
-    public String getPlugin() {
-        return null;
-    }
-
+    @Override
     public String getVersion() {
         return "1.0.1";
     }
@@ -127,8 +122,7 @@ public class PingerExpansion extends PlaceholderExpansion implements Cacheable, 
                 add = address.substring(0, address.indexOf(":"));
                 try {
                     port = Integer.parseInt(address.substring(address.indexOf(":") + 1));
-                } catch (Exception e) {
-                }
+                } catch (Exception ignored) {}
             }
             this.toPing.put(address, new InetSocketAddress(add, port));
         }
@@ -149,8 +143,7 @@ public class PingerExpansion extends PlaceholderExpansion implements Cacheable, 
         }
     }
 
-    /* loaded from: Expansion-pinger.jar:com/extendedclip/expansion/pinger/PingerExpansion$Pinger.class */
-    public final class Pinger {
+    public static final class Pinger {
         private String gameVersion;
         private String motd;
         private String address = "localhost";
@@ -252,7 +245,7 @@ public class PingerExpansion extends PlaceholderExpansion implements Cacheable, 
                 if (packetId == -1) {
                     try {
                         socket.close();
-                    } catch (IOException e) {
+                    } catch (IOException ignored) {
                     }
                     return false;
                 } else if (packetId != 255) {
@@ -307,8 +300,6 @@ public class PingerExpansion extends PlaceholderExpansion implements Cacheable, 
                         return true;
                     }
                 }
-            } catch (SocketException e6) {
-                return false;
             } catch (IOException e7) {
                 return false;
             }
